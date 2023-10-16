@@ -8,16 +8,17 @@ cd users
 if [  -d "$userID" ]; then
     echo "you exist"
 else 
-    echo "nah he dont exist"
+    echo "nok: user ’$userID’ does not exist"
+    exit
 fi
 
 if [  -d "$friendToAdd" ]; then
-    echo "friend exists"
+    echo "$friendToAdd exists in friendList"
 else 
-    echo "nah he dont exist"
+    echo "nok: $friendToAdd does not exist in friendList"
+    exit
 fi
 
-# cat "$userID/friendList.txt"
 if grep "$friendToAdd" "$userID/friendList.txt" > /dev/null; then
     isSuccess=$?
     echo $isSuccess
@@ -28,6 +29,5 @@ if grep "$friendToAdd" "$userID/friendList.txt" > /dev/null; then
     fi
 else
     echo "friend not in friend list"
-    echo $isSuccess
+    echo -e $friendToAdd >> "$userID/friendList.txt"
 fi
-
