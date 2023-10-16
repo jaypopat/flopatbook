@@ -26,5 +26,8 @@ if grep "$friendToAdd" "$userID/friendList.txt" > /dev/null; then
     else
         echo "not a friend"
     fi
+else
+    echo "friend not in friend list"
+    echo $isSuccess
 fi
 
