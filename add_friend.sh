@@ -17,8 +17,20 @@ else
     echo "nah he dont exist"
 fi
 
-if grep "ˆ$friend" "$userID"/friendList.txt > /dev/null; then
-    echo "exit code true so"
+# cat "$userID/friendList.txt"
+
+if grep "ˆ$friendToAdd" "$userID/friendList.txt" > /dev/null; then
+    isSuccess=$?
+    echo $isSuccess
+    if [ $isSuccess -eq 0 ]; then
+        echo "friend detected"
+    else
+        echo "not a friend"
+    fi
 else
-    echo "falsoo"
+    friendName=$(cat "$userID/friendList.txt")
+    echo $friendToAdd
+    echo $friendName
 fi
+
+
