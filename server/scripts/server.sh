@@ -2,7 +2,7 @@
 
 id=$1
 
-read input < server.pipe
+read input < ../../pipes/server.pipe
 set -- $input
 
 request=$1
