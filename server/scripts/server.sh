@@ -1,35 +1,85 @@
 #!/bin/bash
 
+id=$1
 
-while true; do
-   read -p "Enter request and arguments: " command
-   set -- $command
-   case "$1" in
-       create)
-           ./create.sh $2
-           ;;
-       add)
-           ./add_friend.sh $2 $3
-           ;;
-       post)
-           if [ -n "$5" ]; then
-            message="$4"
-            for arg in "${@:5}"; do
-                message+=" $arg"
-            done
-                ./post_messages.sh $2 $3 "$message"
-            else
-                ./post_messages.sh $2 $3 "$4"
-            fi
-           ;;
-       display)
-            echo -e "\n"
-           ./display_wall.sh $2
-           echo -e "\n"
-           ;;
-       *)
-           echo "Accepted Commands: {create|add|post|display}"
-           exit 1
-   esac
-done
+read input < server.pipe
+set -- $input
 
+request=$1
+
+
+case $request in
+    create)
+        ./create.sh $id
+        ;;
+    add)
+        
+        if [ ! $# -eq 2 ]; then
+
+            echo "ERROR: Invalid number of arguments" > ../pipes/$id.pipe
+
+        fi
+
+        friendToAdd=$2
+
+        cd ../users
+
+        if [ ! -d "$id" ]; then  
+
+            echo "ERROR: user $id does not exist" > ../pipes/$id.pipe
+
+        fi
+
+        if [ ! -d "$friendToAdd" ]; then
+
+            echo "ERROR: $friendToAdd does not exist in friendList" > ../pipes/$id.pipe
+
+        fi
+
+        if grep "$friendToAdd" "$id/friendList.txt" > /dev/null; then
+
+            echo "ERROR: $friendToAdd already in friendList" > ../pipes/$id.pipe
+
+        fi
+
+        ./add_friend.sh $id $friendToAdd
+        echo "SUCCESS: $friendToAdd added to $id friend list" > ../pipes/$id.pipe
+        ;;
+    post)
+        if [ $# -lt 3 ]; then
+
+            echo "ERROR: Invalid number of arguments" > ../pipes/$id.pipe
+ 
+        fi
+
+        receiver=$2
+        message=$3
+
+
+        if [ ! -d "$id" ]; then 
+
+            echo "ERROR: user $id does not exist" > ../pipes/$id.pipe
+
+        fi
+
+        if [ ! -d "$receiver" ]; then 
+
+            echo "ERROR: user $receiver does not exist" > ../pipes/$id.pipe
+
+        fi
+
+        ./post_messages.sh $id $receiver $message
+        echo "SUCCESS: Message added to $receiver wall" > ../pipes/$id.pipe
+        ;;
+    display)
+
+        if [ $# -ne 1 ]; then
+
+            echo "ERROR: Invalid number of arguments" > ../pipes/$id.pipe
+ 
+        fi
+
+        ./display_wall.sh $id
+        echo "SUCCESS: $id wallFile.txt displayed!" > ../pipes/$id.pipe
+        ;;
+esac
