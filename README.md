@@ -28,7 +28,7 @@
   `cd server && ./server.sh`
 
   Leave the server running and launch another terminal and run the following command:
-  `cd client && client.sh <username>`
+  `cd client && ./client.sh <username>`
 
 5. **Interact with the program**
 
