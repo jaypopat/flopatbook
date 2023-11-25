@@ -25,10 +25,10 @@
 4. **Run the Scripts**
 
   To run the server script, open a terminal, run the following command:
-  `./server/server.sh`
+  `cd server && ./server.sh`
 
   Leave the server running and launch another terminal and run the following command:
-  `./client/client.sh <username>`
+  `cd client && client.sh <username>`
 
 5. **Interact with the program**
 
