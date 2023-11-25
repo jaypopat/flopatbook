@@ -15,7 +15,7 @@
 
 2. **Navigate to the Unzipped Folder**
 
-  Open the unzipped folder. You should see the directories client and server. The scripts to be executed are `client/client.sh` and `./server/server.sh` inside it.
+  Open the unzipped folder. You should see the directories client and server. The scripts to be executed are `client/client.sh` and `server/server.sh` inside it.
 
 3. **Make the Scripts Executable**
 
