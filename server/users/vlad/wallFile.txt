@@ -1,3 +1,2 @@
-vlad: I am posting on my own wall
-vlad: anotha one
-vlad: posting on my own wall
+vlad: This is my first post on my wall
+jay: Hi Vlad!

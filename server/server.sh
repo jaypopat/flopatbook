@@ -1,24 +1,31 @@
 #!/bin/bash
 
-while true; do 
-    cd ../pipes
+while true; do
 
+    cd ../locks
+    # Release after sending output to $id.pipe
+    ./release.sh "mainLock.txt"
+        
+    cd ../pipes
     read input < server.pipe
     set -- $input
 
-    echo $input
+    # echo $input
 
     request=$1
     id=$2
 
-    echo $request
+    cd ../locks
+    # Acquire before entering critical section
+    ./acquire.sh "mainLock.txt"
+
     cd ../server/scripts
 
     case $request in
         create)
             if [ $# -gt 2 ]; then 
                 cd ../../pipes 
-                echo "ERROR: Permission denied- User $id cannot create new users" > $id.pipe
+                echo "ERROR: permission denied-- user $id cannot create new users" > $id.pipe
                 continue
             fi
 
@@ -30,18 +37,17 @@ while true; do
                 ./create.sh $id
 
                 cd ../../pipes
-                echo "SUCCESS: $id user created" > $id.pipe
+                echo "SUCCESS: user $id created" > $id.pipe
             else
                 cd ../../pipes
-                echo "ERROR: User $id already exists" > $id.pipe
+                echo "ERROR: user $id already exists" > $id.pipe
             fi
             ;;
         add)
-            
             if [ ! $# -eq 3 ]; then
 
                 cd ../../pipes 
-                echo "ERROR: Invalid number of arguments" > $id.pipe
+                echo "ERROR: invalid number of arguments" > $id.pipe
                 continue
             fi
 
@@ -58,14 +64,14 @@ while true; do
             if [ ! -d "$friendToAdd" ]; then
 
                 cd ../../pipes
-                echo "ERROR: $friendToAdd does not exist" > $id.pipe
+                echo "ERROR: user $friendToAdd does not exist" > $id.pipe
                 continue
             fi
 
             if grep "$friendToAdd" "$id/friendList.txt" > /dev/null; then
 
                 cd ../../pipes
-                echo "ERROR: $friendToAdd already in friend list" > $id.pipe
+                echo "ERROR: user $friendToAdd already in $id friend list" > $id.pipe
                 continue
             fi
 
@@ -73,13 +79,13 @@ while true; do
             ./add_friend.sh $id $friendToAdd
 
             cd ../../pipes
-            echo "SUCCESS: $friendToAdd added to $id friend list" > $id.pipe
+            echo "SUCCESS: user $friendToAdd added to $id friend list" > $id.pipe
             ;;
         post)
             if [ $# -lt 4 ]; then
 
                 cd ../../pipes
-                echo "ERROR: Invalid number of arguments" > $id.pipe
+                echo "ERROR: invalid number of arguments" > $id.pipe
                 continue
     
             fi
@@ -99,7 +105,7 @@ while true; do
 
             if ! grep -qF "$id" "$receiver/friendList.txt" && [ $id != $receiver ]; then # if sender not on receiver friend list and if not displaying own wall
                 cd ../../pipes
-                echo "ERROR: user $id not on $receiver friend list!" > $id.pipe
+                echo "ERROR: user $id not on $receiver friend list" > $id.pipe
                 continue
             fi
 
@@ -114,13 +120,12 @@ while true; do
             ./post_messages.sh $id $receiver "$message"
 
             cd ../../pipes
-            echo "SUCCESS: Message added to $receiver wall" > $id.pipe
+            echo "SUCCESS: message added to $receiver wall" > $id.pipe
             ;;
         display)
-
             if [ $# -ne 3 ]; then
                 cd ../../pipes
-                echo "ERROR: Invalid number of arguments" > $id.pipe
+                echo "ERROR: invalid number of arguments" > $id.pipe
                 continue
             fi
 
@@ -143,7 +148,7 @@ while true; do
             ;;
         *)
             cd ../../pipes
-            echo "ERROR: Invalid request!" > $id.pipe
+            echo "ERROR: invalid request!" > $id.pipe
             ;;
     esac
 done

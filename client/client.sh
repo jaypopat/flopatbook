@@ -8,9 +8,26 @@
 #   --> request --> "post"  arguments --> <receiver> <message-without-quotes>
 #   --> request --> "display"   arguments --> <user>
 
+
 cd ../pipes
 
 id=$1
+
+trap '
+ echo -e "\n"
+
+ if [ -d /pipes ] && [ ! -d ../users ]; then # in case there is a user called pipes
+   rm pipes/$id.pipe
+ elif [ -d "../pipes" ]; then
+   rm ../pipes/$id.pipe
+ elif [ -d "../../pipes" ]; then
+   rm ../../pipes/$id.pipe
+ fi
+
+ echo "CTRL + C executed. Removing $id.pipe. Exiting..."
+ exit
+' SIGINT 
+
 
 if [ "$#" -eq 1 ]; then
     echo "Username given: $id"
@@ -22,20 +39,26 @@ if [ "$#" -eq 1 ]; then
     cd ../server/users
 
     if [ ! -d "$id" ]; then
+
         echo "ERROR: User not found"
         read -p "Would you like to create a new user? --> $id (yes/no) : " choice
         
         case "$choice" in
             yes)
 
+<<<<<<< HEAD
                 cd ../pipes
 
                 if [ ! -p "$id.pipe" ]; then 
                     mkfifo $id.pipe
                 fi
+=======
+                cd ../../pipes
+>>>>>>> origin/final
 
-                echo "create $id" > ../../pipes/server.pipe
-             
+                echo "create $id" > server.pipe
+
+                cd ../server/users
                 ;;
             no)
                 echo "Bye!" && exit
