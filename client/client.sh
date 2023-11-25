@@ -28,6 +28,8 @@ if [ "$#" -eq 1 ]; then
         case "$choice" in
             yes)
 
+                cd ../pipes
+
                 if [ ! -p "$id.pipe" ]; then 
                     mkfifo $id.pipe
                 fi
