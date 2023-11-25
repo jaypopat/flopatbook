@@ -32,7 +32,7 @@
 
 5. **Interact with the program**
 
-    If username specified doesnt exist create one using the prompts which follow - else enter the request and when prompted enter the arguments
+  If username specified doesnt exist create one using the prompts which follow - else enter the request and when prompted enter the arguments
 
     
 
