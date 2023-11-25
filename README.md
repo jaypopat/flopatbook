@@ -1,4 +1,4 @@
-# Floppatbook
+# Flopatbook
 
 ## Authors
 
@@ -29,6 +29,7 @@
 
   Leave the server running and launch another terminal and run the following command:
   `./client/client.sh <username>`
+
 5. **Interact with the program**
     If username specified doesnt exist create one using the prompts which follow - else enter the request and when prompted enter the arguments
 
