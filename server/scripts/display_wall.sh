@@ -1,14 +1,11 @@
 #!/bin/bash
 
-userID=$1
+# Not required anymore for FlopatBook-V2
 
-cd ../users
+# userID=$1
 
-# if [ $# -ne 1 ]; then
-#     echo "nok: use format ./display_wall.sh <user>"
-#     exit 1
-# fi
+# cd ../users
 
-echo -e "\n"
-cat $userID/wallFile.txt
-echo -e "\n"
+# echo -e "\n"
+# cat $userID/wallFile.txt
+# echo -e "\n"

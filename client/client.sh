@@ -1,35 +1,38 @@
 #!/bin/bash
 
+# ---------- How to Use ----------
+# 1) Run ./client.sh <user>
+# 2) Create new user if <user> does not exist
+# 3) User can submit following commands:
+#   --> request --> "add"   arguments --> <user-to-add>
+#   --> request --> "post"  arguments --> <receiver> <message-without-quotes>
+#   --> request --> "display"   arguments --> <user>
+
+cd ../pipes
+
 id=$1
 
 if [ "$#" -eq 1 ]; then
     echo "Username given: $id"
 
-    if [ ! -p "../pipes/$id.pipe" ]; then 
-        mkfifo ../pipes/$id.pipe
+    if [ ! -p "server.pipe" ]; then 
+        mkfifo server.pipe
     fi
 
-    if [ ! -p "../pipes/server.pipe" ]; then 
-        mkfifo ../pipes/server.pipe
-    fi
-
-    cd ../users
+    cd ../server/users
 
     if [ ! -d "$id" ]; then
         echo "ERROR: User not found"
-        echo "Would you like to create a new user? --> $id (yes/no) :"
-        read -p choice
+        read -p "Would you like to create a new user? --> $id (yes/no) : " choice
         
         case "$choice" in
             yes)
 
-                echo "create" > ../pipes/server.pipe
+                if [ ! -p "$id.pipe" ]; then 
+                    mkfifo $id.pipe
+                fi
 
-                cd ../server/scripts
-                
-                ./server.sh $id
-
-                cd ..
+                echo "create $id" > ../../pipes/server.pipe
              
                 ;;
             no)
@@ -43,64 +46,33 @@ if [ "$#" -eq 1 ]; then
 
     echo -e "User $id logged in!\n"
 
+    cd ../../pipes
+
+    if [ ! -p "$id.pipe" ]; then 
+        mkfifo $id.pipe
+    fi
+
     while true; do 
-        # echo "Add Friend: add <user-to-add>"
-        # echo "Post on User's Wall: post <receiver> <message>"
-        # echo -e "Display Your Wall: display\n"
-
-        cd ../pipes
-
-        if read serverOutput < $id.pipe ; then # If user.pipe is not empty
-
-            read serverOutput < $id.pipe
-            echo "$serverOutput";
-
+        
+        # This will create a file with output in /pipes
+        if timeout 1s cat $id.pipe > serverOutput; then
+            printf "%s\n" "$(cat serverOutput)"
         fi
 
-        read -p "Enter request with arguments: " request
+        # Concatenate spaces to cause invalid request to occur in server.sh
+        # --> eg. "create bob" for request --> "createbob" = invalid request
+        read -a words -p "Enter request: "
+        request="${words[*]}"
+        request="${request// /}"
 
-        echo $request > server.pipe
+        # Ensure request will always be $1 and id $2 in server.sh
+        if [ -z "$request" ]; then 
+            request="invalid"
+        fi
 
-        cd ../server/scripts
+        read -p "Enter arguments: " args
 
-        ./server.sh $id
-
-        cd ..
-
-        # set -- $request
-    #     request=$1
-
-    #     case $request in
-    #        add)
-
-    #             userToAdd=$2
-
-    #         #    ./add_friend.sh $id $userToAdd
-    #             ./server.sh $request $id $userToAdd
-    #            ;;
-    #        post)
-
-    #             receiver=$2
-    #             message=$3
-
-    #             if [ -n "$4" ]; then
-    #                 for arg in "${@:4}"; do
-    #                     message+=" $arg"
-    #                 done
-    #             fi
-
-    #         #    ./post_messages.sh $id $receiver $message
-    #             ./server.sh $request $id $receiver $message
-    #            ;;
-    #        display)
-                
-    #             # ./display_wall.sh $id
-    #             ./server.sh $request $id
-    #            ;;
-    #        *)
-    #            echo "Accepted Commands: {create|add|post|display}"
-    #            exit 1
-    #    esac
+        echo $request $id $args > server.pipe
     done
 else
     echo "Invalid parameters given"

@@ -16,3 +16,4 @@ cd ../users
 # fi
 
 echo $friendToAdd >> "$userID/friendList.txt"
+echo $id >> "$friendToAdd/friendList.txt"
